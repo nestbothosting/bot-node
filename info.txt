@@ -1,0 +1,15 @@
+npm i - install all modules
+npm run dev - create api key and node id
+npm start - start the node
+
+# .env Model
+----------
+
+MONGODB = "mongodb://127.0.0.1:27017/node"
+Max_Cap = 20
+
+----------
+# API's
+
+status api =  urlpath:/node_status - method:get - res:{ status, node_id }
+create bot = urlpath:/bot/add_bot - method:post - body:{ bot_token, bot_name, owner_id }

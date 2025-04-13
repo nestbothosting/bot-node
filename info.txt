@@ -16,3 +16,7 @@ create bot = urlpath:/bot/add_bot - method:post - body:{ bot_token, bot_name, ow
 check node cap = urlpath:/max_cap' - method:get - res: { status, message }
 get one bot data = urlpath:/bot/bot/:bot_id - method:get - res: { status ,bot }
 get all my bots = urlpath:/bot/mybots/:uid - method:get - res:{ status, bots }
+update bot data = urlpath:/bot/update - method:post - body:{ bot_id, bot_name, bot_token, st_message }
+start a bot = urlpath:/bot/start - method:post - body: { bot_token }
+bot status = urlpath:/bot/status/:token - method:get - res:{ status, message }
+bot stop = urlpath:/bot/stop/:token - method:get - res:{ status, message }

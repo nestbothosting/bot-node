@@ -48,4 +48,25 @@ const Mybots = async (user_id) => {
     }
 }
 
-module.exports = { SaveBot, GetOneBot, Mybots }
+const UpdateBot = async (bot_id, bot_name, bot_token, st_message) => {
+    try {
+        const data = {};
+        if (bot_name) data.bot_name = bot_name;
+        if (bot_token) data.bot_token = bot_token;
+        if (st_message) data.st_message = st_message;
+
+        const updatedBot = await BotModel.findOneAndUpdate(
+            { _id: bot_id },
+            { $set: data },
+            { new: true } 
+        );
+
+        return { status:true, message:"Successfully Updated Bot Data" };
+    } catch (error) {
+        console.error("Error updating bot:", error);
+        return { status:false, message:"Oops Server Error"}
+    }
+};
+
+
+module.exports = { SaveBot, GetOneBot, Mybots, UpdateBot }

@@ -18,4 +18,34 @@ const SaveBot = async (bot_token, bot_name, owner_id) => {
     }
 }
 
-module.exports = { SaveBot }
+const GetOneBot = async (bot_uid) => {
+    try {
+        if(!bot_uid){
+            return { status:false, message:"bot id is required"}
+        }
+
+        const Bot = await BotModel.findById(bot_uid)
+     
+        return { status:true, bot:Bot }   
+    } catch (error) {
+        console.log(error)
+        return { status:false, bot:[] }
+    }
+}
+
+const Mybots = async (user_id) => {
+    try {
+        if(!user_id){
+            return { status:false, message:"User id is required"}
+        }
+
+        const bots = await BotModel.find({ owner_id:user_id })
+
+        return { status:true, bots }
+    } catch (error) {
+        console.log(error.message)
+        return { status:false, bots:[] }
+    }
+}
+
+module.exports = { SaveBot, GetOneBot, Mybots }

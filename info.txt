@@ -13,3 +13,6 @@ Max_Cap = 20
 
 status api =  urlpath:/node_status - method:get - res:{ status, node_id }
 create bot = urlpath:/bot/add_bot - method:post - body:{ bot_token, bot_name, owner_id }
+check node cap = urlpath:/max_cap' - method:get - res: { status, message }
+get one bot data = urlpath:/bot/bot/:bot_id - method:get - res: { status ,bot }
+get all my bots = urlpath:/bot/mybots/:uid - method:get - res:{ status, bots }

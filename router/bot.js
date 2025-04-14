@@ -1,6 +1,6 @@
 const express = require('express')
 const route = express.Router()
-const { SaveBot, GetOneBot, Mybots, UpdateBot } = require('../utilities/bot')
+const { SaveBot, GetOneBot, Mybots, UpdateBot, DeleteBot } = require('../utilities/bot')
 const { Start, Status, Stop } = require('../bot/bot')
 const BotModel = require('../mongodb/model/bot')
 
@@ -67,6 +67,12 @@ route.get('/status/:token', async (req,res) => {
 route.get('/stop/:token', async (req,res) => {
     const { token } = req.params;
     const response = await Stop(token)
+    res.status(200).json(response)
+})
+
+route.post('/delete', async (req,res) => {
+    const { bot_id } = req.body;
+    const response = await DeleteBot(bot_id)
     res.status(200).json(response)
 })
 

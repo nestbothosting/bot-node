@@ -34,7 +34,7 @@ const Start = async (bot_token, st_message) => {
 
         return { status: true, message: `✅ Bot started successfully` }
     } catch (error) {
-        return { status: false, message: error.message, token }
+        return { status: false, message: error.message }
     }
 }
 

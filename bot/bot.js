@@ -55,4 +55,19 @@ const Stop = (token) => {
     return { status:false, message:"Bot not found or already stopped!" }
 }
 
-module.exports = { Start, Status, Stop }
+const MyServers = (token) => {
+    if(!Bots[token]) {
+        return { status:false, message: 'Start The Bot!'};
+    }
+    const server = Bots[token].guilds.cache;
+    return { status:true, message:'', server}
+}
+
+const MyClient = (token) => {
+    if(!Bots[token]){
+        return { status:false, message: 'Start The Bot!'};
+    }
+    return { status:true, client:Bots[token] }
+}
+
+module.exports = { Start, Status, Stop, MyServers, MyClient }

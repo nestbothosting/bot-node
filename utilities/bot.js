@@ -1,4 +1,5 @@
 const BotModel = require('../mongodb/model/bot')
+const { MyClient } = require('../bot/bot')
 
 const SaveBot = async (bot_token, bot_name, owner_id) => {
     if (!bot_token && !bot_name && !owner_id) {
@@ -82,5 +83,28 @@ const DeleteBot = async (bot_id) => {
     }
 };
 
+const GetChannels = async (server_id, bot_token) => {
+    try {
+        const Client = await MyClient(bot_token);
+        if (!Client.status) {
+            return Client 
+        }
 
-module.exports = { SaveBot, GetOneBot, Mybots, UpdateBot, DeleteBot }
+        const clientdata = Client.client;
+        const guild = clientdata.guilds.cache.get(server_id);
+
+        if (!guild) {
+            return { status: false, message: `Server with ID ${server_id} not found.` };
+        }
+
+        const channels = guild.channels.cache;
+
+        return { status: true, channels };
+    } catch (error) {
+        console.error(error.message);
+        return { status: false, message: error.message };
+    }
+};
+
+
+module.exports = { SaveBot, GetOneBot, Mybots, UpdateBot, DeleteBot, GetChannels }

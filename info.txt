@@ -23,3 +23,4 @@ bot stop = urlpath:/bot/stop/:token - method:get - res:{ status, message }
 delete bot = urlpath:/bot/delete - method:post - body: { bot_id }
 get my servers = urlpath:/bot/servers/:token - method:get res: { status, message, server }
 get channels = urlpath:/bot/channels - method:post body: { server_id, bot_token }
+get roles = urlpath:/bot/roles - method:post body: { server_id, bot_token }

@@ -106,5 +106,27 @@ const GetChannels = async (server_id, bot_token) => {
     }
 };
 
+const GetMyRoles = async (server_id,bot_token) => {
+    try {
+        const Client = await MyClient(bot_token)
+        if(!Client.status){
+            return Client;
+        }
+        const client = Client.client;
 
-module.exports = { SaveBot, GetOneBot, Mybots, UpdateBot, DeleteBot, GetChannels }
+        const guild = client.guilds.cache.get(server_id);
+        if(!guild){
+            return { status:false, message:`Guild with ID ${server_id} not found.`}
+        }
+
+        const roles = guild.roles.cache;
+
+        return { status:true, roles }
+    } catch (error) {
+        console.log(error.message)
+        return { status:false, message:error.message }
+    }
+}
+
+
+module.exports = { SaveBot, GetOneBot, Mybots, UpdateBot, DeleteBot, GetChannels, GetMyRoles }

@@ -11,9 +11,11 @@ app.use(cors())
 
 const IndexRouter = require('./router/index')
 const BotRouter = require('./router/bot')
+const EventRouter = require('./router/event')
 
 app.use('/', IndexRouter)
 app.use('/bot', BotRouter)
+app.use('/event', EventRouter)
 
 const PORT = process.env.PORT || 3001
 app.listen(PORT, () => console.log(`Server Running! on Port: ${PORT}`))

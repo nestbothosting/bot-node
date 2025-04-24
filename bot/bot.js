@@ -1,4 +1,6 @@
 const { Client, GatewayIntentBits, ActivityType } = require("discord.js");
+const { interactionCreate } = require('./interactionCreate')
+const { registerCommands } = require('./registerCommands')
 
 let Bots = {}
 
@@ -31,6 +33,9 @@ const Start = async (bot_token, st_message) => {
 
         await client.login(bot_token);
         Bots[bot_token] = client
+
+        interactionCreate(client)
+        registerCommands(bot_token, client.user.id)
 
         return { status: true, message: `✅ Bot started successfully` }
     } catch (error) {

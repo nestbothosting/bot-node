@@ -1,9 +1,20 @@
+const { CreateChannel, CancelTicket } = require('./event/event')
+
 const interactionCreate = (client) => {
      client.on("interactionCreate", async (interaction) => {
           try {
                if (interaction.isChatInputCommand()) {
                     if (interaction.commandName === "ping") {
                          return await interaction.reply("🏓 Pong!");
+                    }
+               }
+
+               if (interaction.isButton()) {
+                    if (interaction.customId === 'ticket_create_btn'){
+                         CreateChannel(interaction)
+                    }
+                    if (interaction.customId === 'cancel_ticket'){
+                         CancelTicket(interaction)
                     }
                }
           } catch (error) {

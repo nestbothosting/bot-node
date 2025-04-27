@@ -95,4 +95,68 @@ const SendTicket = async (ticketdata, fieldvalue, permission, bot_token) => {
     }
 };
 
-module.exports = { SendTicket };
+const SendEmbed = async (bot_token, fields, ticketdata) => {
+    try {
+        const Embed = {}
+
+        const Client = await MyClient(bot_token)
+        if(!Client.status) return Client
+        const client = Client.client
+
+        if (ticketdata.title) Embed.title = ticketdata.title;
+        if (ticketdata.title_url) {
+            const url = await checkOrCreateURL(ticketdata.title_url)
+            Embed.url = url;
+        }
+        if (ticketdata.description) Embed.description = ticketdata.description;
+        if (ticketdata.color) {
+            const color = parseInt(ticketdata.color.replace('#', ''), 16);
+            Embed.color = color;
+        }
+
+        if (ticketdata.auth_name || ticketdata.auth_icon || ticketdata.auth_url) {
+            Embed.author = {};
+            if (ticketdata.auth_name) Embed.author.name = ticketdata.auth_name;
+            if (ticketdata.auth_icon) {
+                const url = await checkOrCreateURL(ticketdata.auth_icon)
+                Embed.author.icon_url = url
+
+            };
+            if (ticketdata.auth_url) {
+                const url = await checkOrCreateURL(ticketdata.auth_url)
+                Embed.author.url = url
+            };
+        }
+
+        if (ticketdata.image_url) {
+            const url = await checkOrCreateURL(ticketdata.image_url)
+            Embed.image = { url: url }
+        };
+
+        if (ticketdata.footer_text || ticketdata.footer_icon) {
+            Embed.footer = {};
+            if (ticketdata.footer_text) Embed.footer.text = ticketdata.footer_text;
+            if (ticketdata.footer_icon) {
+                const url = await checkOrCreateURL(ticketdata.footer_icon)
+                Embed.footer.icon_url = url
+            };
+        }
+
+        if (fields) {
+            Embed.fields = fields;
+        }
+
+        const channel = client.channels.cache.get(ticketdata.channel_id);
+        if(!channel){
+            return { status:false, message:`Channel with ID ${ticketdata.channel_id} not found.` }
+        }
+
+        await channel.send({ embeds: [Embed] });
+        return { status:true, message:'Embed sent successfully.' }
+    } catch (error) {
+        console.log(error.message)
+        return { status:false, message: error.message }
+    }
+}
+
+module.exports = { SendTicket, SendEmbed };

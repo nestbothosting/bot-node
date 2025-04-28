@@ -25,4 +25,6 @@ get my servers = urlpath:/bot/servers/:token - method:get res: { status, message
 get channels = urlpath:/bot/channels - method:post body: { server_id, bot_token }
 get roles = urlpath:/bot/roles - method:post body: { server_id, bot_token }
 send Ticket =  urlpath:/event/ticket - method:post - body:{ ticketdata, fieldvalue, permission, bot_token }
-send Embed message urlpath:/event/embed - method:post - body: { bot_token, fields, embed }
+send Embed message =  urlpath:/event/embed - method:post - body: { bot_token, fields, embed }
+get Ticket Data = urlpath:/inticket/:server_id - method:get res: { status, ticketpanel }
+delete ticket panel = urlpath:/delete_ticket_panel/:server_id - method:get - res: { status, message }

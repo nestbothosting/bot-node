@@ -1,5 +1,5 @@
 npm i - install all modules
-npm run dev - create api key and node id
+npm run base - create api key and node id
 npm start - start the node
 
 # .env Model
@@ -7,6 +7,7 @@ npm start - start the node
 
 MONGODB = "mongodb://127.0.0.1:27017/node"
 Max_Cap = 20
+YOUTUBE_API_KEY = "youtube_api_key"
 
 ----------
 # API's
@@ -28,3 +29,8 @@ send Ticket =  urlpath:/event/ticket - method:post - body:{ ticketdata, fieldval
 send Embed message =  urlpath:/event/embed - method:post - body: { bot_token, fields, embed }
 get Ticket Data = urlpath:/inticket/:server_id - method:get res: { status, ticketpanel }
 delete ticket panel = urlpath:/delete_ticket_panel/:server_id - method:get - res: { status, message }
+
+save YNS data = urlpath:/yns - method:post - body: { data:{}, token }
+get YNS data urlpath:/yns_data/:server_id/:token - method:get - res : { status, message, channel_id, server_id, running, channel_name, channel_icon}
+start YNS = urlpath:/start_listen_yns - method:POST - body : { bot_token, server_id }
+stop YNS = urlpath:/stop_listen_yns - method:POST - body : { server_id }

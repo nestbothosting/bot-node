@@ -1,5 +1,6 @@
 const BotModel = require('../mongodb/model/bot')
 const { MyClient } = require('../bot/bot')
+const YNS_Model = require('../mongodb/model/yns')
 
 const SaveBot = async (bot_token, bot_name, owner_id) => {
     if (!bot_token && !bot_name && !owner_id) {
@@ -52,8 +53,17 @@ const Mybots = async (user_id) => {
 const UpdateBot = async (bot_id, bot_name, bot_token, st_message) => {
     try {
         const data = {};
+        const oldData = await BotModel.findById(bot_id)
+
         if (bot_name) data.bot_name = bot_name;
-        if (bot_token) data.bot_token = bot_token;
+        if (bot_token){
+            data.bot_token = bot_token
+            const YNS_Data = await YNS_Model.findOne({ bot_token:oldData.bot_token })
+            if(YNS_Data){
+                YNS_Data.bot_token = bot_token;
+                await YNS_Data.save()
+            }
+        };
         if (st_message) data.st_message = st_message;
 
         const updatedBot = await BotModel.findOneAndUpdate(

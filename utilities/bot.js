@@ -176,6 +176,10 @@ const GetBotInfo = async (bot_id) => {
         } else {
             Response.bot_name = ClientData.client.user.username;
             Response.bot_id = ClientData.client.user.id;
+            Response.bot_avatar = ClientData.client.user.displayAvatarURL({
+                dynamic: true,
+                size: 512
+            });
             (Response.bot_status = true), (Response.status = true);
             return Response;
         }

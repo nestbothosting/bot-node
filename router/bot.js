@@ -1,6 +1,6 @@
 const express = require('express')
 const route = express.Router()
-const { SaveBot, GetOneBot, Mybots, UpdateBot, DeleteBot, GetChannels, GetMyRoles } = require('../utilities/bot')
+const { SaveBot, GetOneBot, Mybots, UpdateBot, DeleteBot, GetChannels, GetMyRoles, GetBotInfo } = require('../utilities/bot')
 const { Start, Status, Stop, MyServers } = require('../bot/bot')
 const BotModel = require('../mongodb/model/bot')
 
@@ -91,6 +91,12 @@ route.post('/channels', async (req,res) => {
 route.post('/roles', async (req,res) => {
     const { server_id, bot_token } = req.body;
     const response = await GetMyRoles(server_id,bot_token)
+    res.status(200).json(response)
+})
+
+route.get('/info/:bot_id', async (req,res) => {
+    const { bot_id } = req.params;
+    const response = await GetBotInfo(bot_id)
     res.status(200).json(response)
 })
 

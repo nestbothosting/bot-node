@@ -2,7 +2,7 @@ const express = require('express')
 const route = express.Router()
 const { Node_ID } = require('../core/auth.json')
 const { CheckCap, InTicket, DeleteTicketPanel } = require('../utilities/index')
-const { SaveYTS, YNS_Data, Start_Listening, Stop_Listening } = require('../sp_event/yts')
+const { SaveYTS, YNS_Data, Start_Listening, Stop_Listening, DeleteYNS } = require('../sp_event/yts')
 
 route.get('/node_status', (req,res) => {
     res.status(200).json({ status:true, node_id:Node_ID })
@@ -52,5 +52,11 @@ route.post('/stop_listen_yns', async (req,res) => {
     const response = await Stop_Listening(server_id)
     res.status(200).json(response)
 }) 
+
+route.post('/delete_yns', async (req,res) => {
+    const { server_id } = req.body;
+    const response = await DeleteYNS(server_id)
+    res.status(200).json(response)
+})
 
 module.exports = route;

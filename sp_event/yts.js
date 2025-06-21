@@ -1,5 +1,6 @@
 const YNSModel = require('../mongodb/model/yns');
 const Youtube = require('simple-youtube-api')
+const { MyClient } = require('../bot/bot')
 
 const youtube_api = new Youtube(process.env.YOUTUBE_API_KEY)
 let Running_YNS = {}
@@ -63,7 +64,7 @@ async function YNS_Data(server_id, bot_token) {
             channel_id: Data.channel_id, // dc channel id 
             server_id: Data.server_id //dc server id
         }
-        if (Running_YNS[Data.bot_token]) {
+        if (Running_YNS[Data.server_id]) {
             returnData.running = true
         } else {
             returnData.running = false;
@@ -115,33 +116,108 @@ async function Start_Listening(server_id, bot_token) {
                 if (svideo.id !== channelD.last_video_id) {
                     channelD.last_video_id = svideo.id;
                     await channelD.save();
-
-                    console.log(`📢 New video from ${channelD.yt_channel_id}: ${svideo.title}`);
-
+                    // console.log(svideo)
+                    // console.log(`📢 New video from ${channelD.yt_channel_id}: ${svideo.title}`);
+                    SendEmbedYNS(channelD, svideo)
                     // 🔔 Call your sendDiscordNotification(svideo, channelD.server_id) here
                 }
             } catch (loopErr) {
                 console.error(`Loop Error for server ${server_id}:`, loopErr.message);
             }
-        }, 60 * 1000); // 60 seconds
+        }, 10 * 1000); // 60 seconds
 
-        if(Running_YNS[server_id]){
+        if (Running_YNS[server_id]) {
             clearInterval(Running_YNS[server_id])
             delete Running_YNS[server_id];
         }
         Running_YNS[server_id] = Loop
-        return { status:true, message:"Start to Listen"}
+        return { status: true, message: "Start to Listen" }
     } catch (error) {
-        console.error(`Start_Listening Error for server ${server_id}:`, error.message);
-        return { status:false, message:"Start_Listening Error"}
+        console.error(`Start_Listening Error for server ${server_id}:`, error);
+        return { status: false, message: "Start_Listening Error" }
     }
 }
 
-function Stop_Listening(server_id){
-    if(!server_id) return { status:false, message:"Server ID required" }
+function Stop_Listening(server_id) {
+    if (!server_id) return { status: false, message: "Server ID required" }
     clearInterval(Running_YNS[server_id])
     delete Running_YNS[server_id];
-    return { status:true, message:`Clear Listening. Server ID:${server_id}`}
+    return { status: true, message: `Clear Listening. Server ID:${server_id}` }
 }
 
-module.exports = { SaveYTS, YNS_Data, Start_Listening, Stop_Listening }
+async function DeleteYNS(server_id) {
+    try {
+        if (!server_id) return { status: false, message: "Server ID required" }
+        await YNSModel.findOneAndDelete({ server_id: server_id })
+        return { status: true, message: "successfully deleted" }
+    } catch (error) {
+        console.log(error.message)
+        return { status: false, message: error.message }
+    }
+}
+
+async function SendEmbedYNS(ChannelData, video) {
+    try {
+        console.log(ChannelData)
+        console.log(video)
+        if (!ChannelData.bot_token) return;
+
+        const client = await MyClient(ChannelData.bot_token);
+        if (!client.status) return client;
+
+        const guild = client.client.guilds.cache.get(ChannelData.server_id);
+        if (!guild) return console.error("Guild not found");
+
+        // const channel = guild.channels.cache.get(ChannelData.channel_id);
+        // if (!channel) return console.error("Channel not found");
+
+        const videoUrl = `https://www.youtube.com/watch?v=${video.id}`;
+        const replacements = {
+            "{channel}": video.raw.snippet.channelTitle,
+            "{role}": `<@&${ChannelData.role_id}>`,
+            "{title}": video.title,
+            "{link}": videoUrl
+        };
+
+        // Helper function to replace placeholders
+        const replacePlaceholders = (template) => {
+            return Object.entries(replacements).reduce((acc, [key, val]) => {
+                return acc.replace(new RegExp(key, 'g'), val);
+            }, template);
+        };
+
+        const Embed = {
+            title: ChannelData.embed.title
+                ? replacePlaceholders(ChannelData.embed.title)
+                : `${video.raw.snippet.channelTitle} just uploaded ${video.title} at ${videoUrl}`,
+
+            description: ChannelData.embed.description
+                ? replacePlaceholders(ChannelData.embed.description)
+                : `${video.raw.snippet.channelTitle} published a video on YouTube!`,
+
+            color: 0xff0000,
+            footer: {
+                text: `Uploaded by ${video.raw.snippet.channelTitle}`
+            },
+            thumbnail: {
+                url: ChannelData.embed.thumbnail_url || undefined
+            },
+            image: {
+                url: video.thumbnails?.medium?.url || video.thumbnails?.default?.url
+            }
+        };
+
+        console.log(Embed);
+
+        // Uncomment to send
+        // await channel.send({
+        //     content: replacePlaceholders(ChannelData.title || ''),
+        //     embeds: [Embed]
+        // });
+
+    } catch (error) {
+        console.error("Failed to send embed:", error);
+    }
+}
+
+module.exports = { SaveYTS, YNS_Data, Start_Listening, Stop_Listening, DeleteYNS }

@@ -34,3 +34,5 @@ save YNS data = urlpath:/yns - method:post - body: { data:{}, token }
 get YNS data urlpath:/yns_data/:server_id/:token - method:get - res : { status, message, channel_id, server_id, running, channel_name, channel_icon}
 start YNS = urlpath:/start_listen_yns - method:POST - body : { bot_token, server_id }
 stop YNS = urlpath:/stop_listen_yns - method:POST - body : { server_id }
+delete YNS = urlpath:/delete_yns - method:POST - body : { server_id }
+bot info (botstatus - page)  - urlpath:/bot/info/:bot_id - method:Get - res : { node_id, bot_name, node_id, status, bot_status }

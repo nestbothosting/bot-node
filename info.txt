@@ -36,3 +36,9 @@ start YNS = urlpath:/start_listen_yns - method:POST - body : { bot_token, server
 stop YNS = urlpath:/stop_listen_yns - method:POST - body : { server_id }
 delete YNS = urlpath:/delete_yns - method:POST - body : { server_id }
 bot info (botstatus - page)  - urlpath:/bot/info/:bot_id - method:Get - res : { node_id, bot_name, node_id, status, bot_status }
+
+Create Timedmessage - urlpath:/event/timedmessage - method:post - body : { status, message }
+Get Timedmessage = urlpath:/event/my_timedmessage?server_id - method:get - res : { isTMS, TMS, status, message }
+Start Timedmessage = urlpath:/event/start_timedmessage/:c_id - method:get - res : { status, message }
+stop Timedmessage = urlpath:/event/stop_timedmessage/:c_id - method:get - res : { status, message }
+Delete Timedmessage = urlpath:/event/delete_timedmessage - method:post - body : { c_id }

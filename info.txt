@@ -13,6 +13,7 @@ YOUTUBE_API_KEY = "youtube_api_key"
 # API's
 
 status api =  urlpath:/node_status - method:get - res:{ status, node_id }
+
 create bot = urlpath:/bot/add_bot - method:post - body:{ bot_token, bot_name, owner_id }
 check node cap = urlpath:/max_cap' - method:get - res: { status, message }
 get one bot data = urlpath:/bot/bot/:bot_id - method:get - res: { status ,bot }
@@ -42,3 +43,7 @@ Get Timedmessage = urlpath:/event/my_timedmessage?server_id - method:get - res :
 Start Timedmessage = urlpath:/event/start_timedmessage/:c_id - method:get - res : { status, message }
 stop Timedmessage = urlpath:/event/stop_timedmessage/:c_id - method:get - res : { status, message }
 Delete Timedmessage = urlpath:/event/delete_timedmessage - method:post - body : { c_id }
+
+Create Welcome Message = urlpath:/set_welcome_message - method:post - body : { server_id, channel_id, message, bot_id }
+Creat Leave Message = urlpath:/set_leave_message - method:post - body : { server_id, channel_id, message, bot_id }
+Delete Welcome Leave Message = urlpath:/delete_wlms - method:post - body : { server_id, type }

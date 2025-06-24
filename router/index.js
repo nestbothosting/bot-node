@@ -1,7 +1,7 @@
 const express = require('express')
 const route = express.Router()
 const { Node_ID } = require('../core/auth.json')
-const { CheckCap, InTicket, DeleteTicketPanel } = require('../utilities/index')
+const { CheckCap, InTicket, DeleteTicketPanel, CreateWelcomeMessage, CreateLeaveMessage, DeleteWLMessage } = require('../utilities/index')
 const { SaveYTS, YNS_Data, Start_Listening, Stop_Listening, DeleteYNS } = require('../sp_event/yts')
 
 route.get('/node_status', (req,res) => {
@@ -56,6 +56,24 @@ route.post('/stop_listen_yns', async (req,res) => {
 route.post('/delete_yns', async (req,res) => {
     const { server_id } = req.body;
     const response = await DeleteYNS(server_id)
+    res.status(200).json(response)
+})
+
+route.post('/set_welcome_message', async (req,res) => {
+    const { server_id, channel_id, message, bot_id } = req.body;
+    const response = await CreateWelcomeMessage(server_id, channel_id, message, bot_id)
+    res.status(200).json(response)
+})
+
+route.post('/set_leave_message', async (req,res) => {
+    const { server_id, channel_id, message, bot_id } = req.body;
+    const response = await CreateLeaveMessage(server_id, channel_id, message, bot_id)
+    res.status(200).json(response)
+})
+
+route.post('/delete_wlms', async (req,res) => {
+    const { server_id, type } = req.body;
+    const response = await DeleteWLMessage(server_id, type)
     res.status(200).json(response)
 })
 

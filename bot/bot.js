@@ -1,6 +1,7 @@
 const { Client, GatewayIntentBits, ActivityType } = require("discord.js");
 const { interactionCreate } = require('./interactionCreate')
 const { registerCommands } = require('./registerCommands')
+const { SendWelcomeMessage, SendLeaveMessage } = require('../utilities/index')
 
 let Bots = {}
 
@@ -13,7 +14,8 @@ const Start = async (bot_token, st_message) => {
             intents: [
                 GatewayIntentBits.Guilds,
                 GatewayIntentBits.GuildMessages,
-                GatewayIntentBits.MessageContent
+                GatewayIntentBits.MessageContent,
+                GatewayIntentBits.GuildMembers
             ]
         });
         client.once('ready', () => {
@@ -30,6 +32,14 @@ const Start = async (bot_token, st_message) => {
                 message.reply('Pong! 🏓');
             }
         });
+
+        client.on('guildMemberAdd', member => {
+           SendWelcomeMessage(member)
+        })
+
+        client.on('guildMemberRemove', async member => {
+            SendLeaveMessage(member)
+        })
 
         await client.login(bot_token);
         Bots[bot_token] = client

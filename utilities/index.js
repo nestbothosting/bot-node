@@ -164,4 +164,24 @@ const DeleteWLMessage = async (server_id, type) => {
     }
 };
 
-module.exports = { CheckCap, InTicket, DeleteTicketPanel, CreateWelcomeMessage, CreateLeaveMessage, SendWelcomeMessage, SendLeaveMessage, DeleteWLMessage }
+const GetWelcomeLeaveMessageData = async (server_id) => {
+    try {
+        if (!server_id) {
+            return { status: false, message: "Server ID is required.", data: null };
+        }
+
+        const data = await WLMModel.findOne({ server_id });
+
+        if (!data) {
+            return { status: false, message: "No data found for this server.", data: null };
+        }
+
+        return { status: true, message: "Data fetched successfully.", data };
+    } catch (error) {
+        console.error("❌ Error fetching server data:", error);
+        return { status: false, message: "Internal server error", data: null };
+    }
+};
+
+
+module.exports = { CheckCap, InTicket, DeleteTicketPanel, CreateWelcomeMessage, CreateLeaveMessage, SendWelcomeMessage, SendLeaveMessage, DeleteWLMessage, GetWelcomeLeaveMessageData }

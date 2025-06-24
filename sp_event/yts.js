@@ -168,8 +168,8 @@ async function SendEmbedYNS(ChannelData, video) {
         const guild = client.client.guilds.cache.get(ChannelData.server_id);
         if (!guild) return console.error("Guild not found");
 
-        // const channel = guild.channels.cache.get(ChannelData.channel_id);
-        // if (!channel) return console.error("Channel not found");
+        const channel = guild.channels.cache.get(ChannelData.channel_id);
+        if (!channel) return console.error("Channel not found");
 
         const videoUrl = `https://www.youtube.com/watch?v=${video.id}`;
         const replacements = {
@@ -207,13 +207,10 @@ async function SendEmbedYNS(ChannelData, video) {
             }
         };
 
-        console.log(Embed);
-
-        // Uncomment to send
-        // await channel.send({
-        //     content: replacePlaceholders(ChannelData.title || ''),
-        //     embeds: [Embed]
-        // });
+        await channel.send({
+            content: replacePlaceholders(ChannelData.title || ''),
+            embeds: [Embed]
+        });
 
     } catch (error) {
         console.error("Failed to send embed:", error);

@@ -2,6 +2,7 @@ const BotModel = require("../mongodb/model/bot");
 const { MyClient } = require("../bot/bot");
 const YNS_Model = require("../mongodb/model/yns");
 const { Node_ID } = require("../core/auth.json");
+const { SaveBotLog } = require('../sp_event/botlog')
 
 const SaveBot = async (bot_token, bot_name, owner_id) => {
     if (!bot_token && !bot_name && !owner_id) {
@@ -18,6 +19,7 @@ const SaveBot = async (bot_token, bot_name, owner_id) => {
             owner_id,
         });
         await NewBot.save();
+        SaveBotLog(NewBot._id, "Create New Collection", "Create Bot")
         return { status: true, message: "Successfully add Bot", id: NewBot._id };
     } catch (error) {
         console.log(error.message);
@@ -93,6 +95,8 @@ const DeleteBot = async (bot_id) => {
         if (!deletedbot) {
             return { status: false, message: "Bot not found" };
         }
+
+        SaveBotLog(deletedbot._id, "Delete The Bot", "Delete")
 
         return {
             status: true,

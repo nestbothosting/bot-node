@@ -1,6 +1,7 @@
 const TimedMessageModel = require('../mongodb/model/timedmessage')
 const BotModel = require('../mongodb/model/bot');
 const { MyClient } = require('../bot/bot');
+const { SaveBotLog } = require('./botlog')
 
 const MessageLoop = {}
 
@@ -49,6 +50,7 @@ const SetMessage = async (tday, thours, tminutes, server_id, channel_id, message
         });
 
         await NewData.save();
+        SaveBotLog(bot_id, `Create New Timed Message System. Server ID: ${server_id}`, "TMS")
         return { status: true, message: "Timed message successfully Create!" };
 
     } catch (error) {
@@ -162,7 +164,8 @@ const DeleteMessage = async (c_id) => {
             clearInterval(MessageLoop[c_id])
             delete MessageLoop[c_id];
         }
-        await TimedMessageModel.findByIdAndDelete(c_id)
+        const DeletedData = await TimedMessageModel.findByIdAndDelete(c_id)
+        SaveBotLog(DeletedData.bot_id, `Delete Timed Message System. Server ID: ${DeletedData.server_id}`, "TMS")
         return { status: true, message: "Message Loop Collection Deleted Successfully" }
     } catch (error) {
         console.log(error.message)

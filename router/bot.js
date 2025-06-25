@@ -3,6 +3,7 @@ const route = express.Router()
 const { SaveBot, GetOneBot, Mybots, UpdateBot, DeleteBot, GetChannels, GetMyRoles, GetBotInfo } = require('../utilities/bot')
 const { Start, Status, Stop, MyServers } = require('../bot/bot')
 const BotModel = require('../mongodb/model/bot')
+const { GetBotLog } = require('../sp_event/botlog')
 
 route.post('/add_bot', async (req, res) => {
     try {
@@ -97,6 +98,12 @@ route.post('/roles', async (req,res) => {
 route.get('/info/:bot_id', async (req,res) => {
     const { bot_id } = req.params;
     const response = await GetBotInfo(bot_id)
+    res.status(200).json(response)
+})
+
+route.get('/log/:bot_cid', async (req,res) => {
+    const { bot_cid } = req.params;
+    const response = await GetBotLog(bot_cid)
     res.status(200).json(response)
 })
 

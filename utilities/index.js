@@ -1,6 +1,7 @@
 const BotModel = require('../mongodb/model/bot')
 const TicketModel = require('../mongodb/model/ticket')
 const WLMModel = require('../mongodb/model/wl_message')
+const { SaveBotLog } = require('../sp_event/botlog')
 require('dotenv').config()
 
 const CheckCap = async () => {
@@ -52,6 +53,7 @@ const CreateWelcomeMessage = async (server_id, channel_id, message, bot_id) => {
             EXData.Iswelcome = true;
             EXData.wl_channel_id = channel_id;
             await EXData.save()
+            SaveBotLog(bot_id, `Set Welcome Message. Server ID: ${server_id}`, "WelcomeMS")
             return { status: true, message: "Welcome message updated successfully." };
         }
         const NewData = new WLMModel({
@@ -61,6 +63,7 @@ const CreateWelcomeMessage = async (server_id, channel_id, message, bot_id) => {
             welcome_message: message,
             Iswelcome: true
         });
+        SaveBotLog(bot_id, `Set Welcome Message. Server ID: ${server_id}`, "WelcomeMS")
         await NewData.save();
         return { status: true, message: "Welcome message created successfully." };
     } catch (error) {
@@ -79,6 +82,7 @@ const CreateLeaveMessage = async (server_id, channel_id, message, bot_id) => {
             EXData.isleave = true;
             EXData.lv_channel_id = channel_id;
             await EXData.save()
+            SaveBotLog(bot_id, `Set Leave Message. Server ID: ${server_id}`, "LeaveMS")
             return { status: true, message: "Leave message updated successfully." };
         }
         const NewData = new WLMModel({
@@ -89,6 +93,7 @@ const CreateLeaveMessage = async (server_id, channel_id, message, bot_id) => {
             isleave: true
         });
         await NewData.save();
+        SaveBotLog(bot_id, `Set Leave Message. Server ID: ${server_id}`, "LeaveMS")
         return { status: true, message: "Leave message created successfully." };
     } catch (error) {
         console.error("Error creating Leave message:", error);
@@ -156,6 +161,7 @@ const DeleteWLMessage = async (server_id, type) => {
         }
 
         await data.save();
+        SaveBotLog(WLMModel.bot_id, `Delete ${type} System. Server ID: ${server_id}`, `${type}MS`)
         return { status: true, message: `${type} message deleted successfully.` };
 
     } catch (error) {

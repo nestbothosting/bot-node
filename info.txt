@@ -48,3 +48,5 @@ Create Welcome Message = urlpath:/set_welcome_message - method:post - body : { s
 Creat Leave Message = urlpath:/set_leave_message - method:post - body : { server_id, channel_id, message, bot_id }
 Delete Welcome Leave Message = urlpath:/delete_wlms - method:post - body : { server_id, type }
 Get Welcome Leave Message data = urlpath:/get_wlms/:server_id - method:get - body : { status, message, data }
+
+Get Bot Logs = urlpath:/bot/log/:bot_cid - method:get - res : { status, message, log }

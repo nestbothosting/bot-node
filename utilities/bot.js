@@ -13,6 +13,13 @@ const SaveBot = async (bot_token, bot_name, owner_id) => {
         };
     }
     try {
+        const botCount = await BotModel.countDocuments({ owner_id });
+        if (botCount >= 2) {
+            return {
+                status: false,
+                message: "You can only create up to 2 bots.",
+            };
+        }
         const NewBot = new BotModel({
             bot_token,
             bot_name,

@@ -1,4 +1,4 @@
-const { CreateChannel, CancelTicket } = require('./event/event')
+const { CreateChannel, CancelTicket, UserInfo, ServerInfo, ClearMessage, Kick, Ban } = require('./event/event')
 
 const interactionCreate = (client) => {
      client.on("interactionCreate", async (interaction) => {
@@ -7,13 +7,47 @@ const interactionCreate = (client) => {
                     if (interaction.commandName === "ping") {
                          return await interaction.reply("🏓 Pong!");
                     }
+                    if (interaction.commandName === "say") {
+                         const message = interaction.options.getString('message');
+                         await interaction.reply(message);
+                    }
+                    if (interaction.commandName === 'userinfo') {
+                         const user = interaction.options.getUser('user') || interaction.user;
+                         const memberObj = interaction.guild ? await interaction.guild.members.fetch(user.id) : null;
+                         UserInfo(interaction, user, memberObj)
+                    }
+                    if (interaction.commandName === 'serverinfo') {
+                         const { guild } = interaction;
+                         const owner = await guild.fetchOwner();
+                         ServerInfo(guild, owner, interaction)
+                    }
+                    if (interaction.commandName === 'clear') {
+                         const amount = interaction.options.getInteger('amount');
+                         if (!interaction.channel || !interaction.channel.bulkDelete) {
+                              return interaction.reply({
+                                   content: "❌ This command can only be used in text channels.",
+                                   ephemeral: true,
+                              });
+                         }
+                         ClearMessage(interaction, amount)
+                    }
+                    if (interaction.commandName === 'kick') {
+                         const user = interaction.options.getUser('user');
+                         const reason = interaction.options.getString('reason') || 'No reason provided';
+                         Kick(user, reason, interaction)
+                    }
+                    if (interaction.commandName === 'ban') {
+                         const user = interaction.options.getUser('user');
+                         const reason = interaction.options.getString('reason') || 'No reason provided';
+                         Ban(user,reason,interaction)
+                    }
                }
 
                if (interaction.isButton()) {
-                    if (interaction.customId === 'ticket_create_btn'){
+                    if (interaction.customId === 'ticket_create_btn') {
                          CreateChannel(interaction)
                     }
-                    if (interaction.customId === 'cancel_ticket'){
+                    if (interaction.customId === 'cancel_ticket') {
                          CancelTicket(interaction)
                     }
                }

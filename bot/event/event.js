@@ -8,7 +8,7 @@ const CreateChannel = async (interaction) => {
             return await interaction.reply({ content: 'This command can only be used inside a server.', ephemeral: true });
         }
         await interaction.deferReply({ ephemeral: true });
-        
+
         const server_id = guild.id;
         const PanelData = await TicketModel.findOne({ server_id: server_id });
 
@@ -26,7 +26,7 @@ const CreateChannel = async (interaction) => {
                 console.warn(`Invalid role permissions found in PanelData: ${JSON.stringify(rolePerm)}`);
                 return null; // Skip invalid entries
             }
-            
+
             return {
                 id: rolePerm.role_id,
                 allow: rolePerm.permission.map(p => BigInt(p.code)),
@@ -105,4 +105,127 @@ const CancelTicket = async (interaction) => {
     }
 };
 
-module.exports = { CreateChannel, CancelTicket };
+const UserInfo = async (interaction, user, memberObj) => {
+    const embed = {
+        color: 0x00bfff,
+        title: `User Info: ${user.username}`,
+        thumbnail: { url: user.displayAvatarURL({ dynamic: true }) },
+        fields: [
+            { name: "Username", value: user.tag, inline: true },
+            { name: "User ID", value: user.id, inline: true },
+            {
+                name: "Account Created",
+                value: `<t:${Math.floor(user.createdTimestamp / 1000)}:F>`,
+                inline: false,
+            },
+        ],
+        timestamp: new Date(),
+    };
+
+    if (memberObj) {
+        embed.fields.push({
+            name: "Joined Server",
+            value: `<t:${Math.floor(memberObj.joinedTimestamp / 1000)}:F>`,
+            inline: false,
+        });
+    }
+
+    await interaction.reply({ embeds: [embed] });
+};
+
+const ServerInfo = async (guild, owner, interaction) => {
+    const embed = {
+        color: 0x00bfff,
+        title: `Server Info: ${guild.name}`,
+        thumbnail: {
+            url: guild.iconURL({ dynamic: true }),
+        },
+        fields: [
+            { name: "Server Name", value: guild.name, inline: true },
+            { name: "Server ID", value: guild.id, inline: true },
+            { name: "Owner", value: `${owner.user.tag} (${owner.id})`, inline: false },
+            { name: "Members", value: `${guild.memberCount}`, inline: true },
+            { name: "Boosts", value: `${guild.premiumSubscriptionCount}`, inline: true },
+            {
+                name: "Created On",
+                value: `<t:${Math.floor(guild.createdTimestamp / 1000)}:F>`,
+                inline: false
+            },
+            { name: "Roles", value: `${guild.roles.cache.size}`, inline: true },
+        ],
+        footer: {
+            text: `Requested by ${interaction.user.tag}`,
+            icon_url: interaction.user.displayAvatarURL({ dynamic: true })
+        },
+        timestamp: new Date(),
+    };
+
+    await interaction.reply({ embeds: [embed] });
+}
+
+const ClearMessage = async (interaction, amount) => {
+    try {
+        // Deleting the messages
+        const deleted = await interaction.channel.bulkDelete(amount, true);
+        await interaction.reply({
+            content: `✅ Deleted ${deleted.size} messages.`,
+            ephemeral: true,
+        });
+    } catch (err) {
+        console.error(err);
+        await interaction.reply({
+            content: "❌ Failed to delete messages. Make sure they are not older than 14 days.",
+            ephemeral: true,
+        });
+    }
+}
+
+const Kick = async (user, reason, interaction) => {
+    if (!interaction.guild) {
+        return interaction.reply({ content: "❌ This command can only be used in a server.", ephemeral: true });
+    }
+
+    const member = await interaction.guild.members.fetch(user.id).catch(() => null);
+
+    if (!member) {
+        return interaction.reply({ content: "❌ Member not found in this server.", ephemeral: true });
+    }
+
+    if (!member.kickable) {
+        return interaction.reply({ content: "❌ I can't kick this user. Do they have a higher role than me?", ephemeral: true });
+    }
+
+    try {
+        await member.kick(reason);
+        await interaction.reply(`✅ Kicked ${user.tag} for: **${reason}**`);
+    } catch (err) {
+        console.error(err);
+        await interaction.reply({ content: "❌ Failed to kick the user.", ephemeral: true });
+    }
+}
+
+const Ban = async (user, reason, interaction) => {
+
+    if (!interaction.guild) {
+        return interaction.reply({ content: "❌ This command can only be used in a server.", ephemeral: true });
+    }
+
+    const member = await interaction.guild.members.fetch(user.id).catch(() => null);
+    if (!member) {
+        return interaction.reply({ content: "❌ Member not found in this server.", ephemeral: true });
+    }
+
+    if (!member.bannable) {
+        return interaction.reply({ content: "❌ I can't ban this user. They might have a higher role or be the server owner.", ephemeral: true });
+    }
+
+    try {
+        await member.ban({ reason });
+        await interaction.reply(`✅ Banned ${user.tag} for: **${reason}**`);
+    } catch (err) {
+        console.error(err);
+        await interaction.reply({ content: "❌ Failed to ban the user.", ephemeral: true });
+    }
+}
+
+module.exports = { CreateChannel, CancelTicket, UserInfo, ServerInfo, ClearMessage, Kick, Ban };

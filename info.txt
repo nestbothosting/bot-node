@@ -51,4 +51,6 @@ Get Welcome Leave Message data = urlpath:/get_wlms/:server_id - method:get - res
 
 Get Bot Logs = urlpath:/bot/log/:bot_cid - method:get - res : { status, message, log } - body : { status, message }
 
-set Auto Role Add = urlpath:/event/autoroleadd - method:post - body : { status, message }
+set Auto Role Add = urlpath:/event/autoroleadd - method:post - body : { server_id, role_id, bot_id }
+
+send Message a Channel = urlpath:/event/say - method:post - body : { server_id, channel_id, message, token }

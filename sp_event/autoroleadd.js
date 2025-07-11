@@ -1,7 +1,8 @@
-const AddRoleModel = require('../mongodb/model/autoroleadd')
+const AddRoleModel = require('../mongodb/model/autoroleadd');
+const { SaveBotLog } = require('./botlog');
 
 
-const SetAutoRole = async (server_id, role_id) => {
+const SetAutoRole = async (server_id, role_id, bot_id) => {
     try {
         const existing = await AddRoleModel.findOne({ server_id });
 
@@ -11,6 +12,8 @@ const SetAutoRole = async (server_id, role_id) => {
 
         const newRole = new AddRoleModel({ role_id, server_id });
         await newRole.save();
+
+        SaveBotLog(bot_id, `Set Auto Role Add system. Role id:${role_id}, server id:${server_id}`, 'AutoRoleAdd')
 
         return { status: true, message: "Auto-role set successfully." };
     } catch (error) {

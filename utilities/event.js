@@ -159,4 +159,34 @@ const SendEmbed = async (bot_token, fields, ticketdata) => {
     }
 }
 
-module.exports = { SendTicket, SendEmbed };
+const SayText = async (server_id, channel_id, message, token) => {
+    try {
+        if (!server_id || !channel_id || !message) {
+            return { status: false, message: "Oops! Enter all fields" };
+        }
+
+        const client = await MyClient(token);
+        if (!client.status) return client;
+
+        // Fetch the guild (server)
+        const guild = await client.client.guilds.fetch(server_id).catch(() => null);
+        if (!guild) return { status: false, message: "Server not found or bot not in server" };
+
+        // Fetch the channel
+        const channel = await guild.channels.fetch(channel_id).catch(() => null);
+        if (!channel || !channel.isTextBased()) {
+            return { status: false, message: "Channel not found or is not a text channel" };
+        }
+
+        // Send the message
+        await channel.send(message);
+
+        return { status: true, message: "Message sent successfully" };
+    } catch (error) {
+        console.error("Error in SayText:", error);
+        return { status: false, message: "An error occurred while sending the message" };
+    }
+};
+
+
+module.exports = { SendTicket, SendEmbed, SayText };

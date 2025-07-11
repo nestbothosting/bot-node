@@ -3,6 +3,7 @@ const route = express.Router()
 const { SendTicket, SendEmbed } = require('../utilities/event')
 const { Mcstatus } = require('../sp_event/mcstatus')
 const { SetMessage, GetMessages, StartMessage, StopMessage, DeleteMessage } = require('../sp_event/timedmessage')
+const { SetAutoRole } = require('../sp_event/autoroleadd')
 
 route.post('/ticket', async (req,res) => {
     const { ticketdata, fieldvalue, permission, bot_token } = req.body;
@@ -50,6 +51,12 @@ route.get('/stop_timedmessage/:c_id', async (req,res) => {
 route.post('/delete_timedmessage', async (req,res) => {
     const { c_id } = req.body;
     const response = await DeleteMessage(c_id)
+    res.status(200).json(response)
+})
+
+route.post('/autoroleadd', async (req,res) => {
+    const { server_id, role_id } = req.body;
+    const response = await SetAutoRole(server_id, role_id)
     res.status(200).json(response)
 })
 

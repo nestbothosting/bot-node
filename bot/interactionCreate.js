@@ -1,4 +1,5 @@
-const { CreateChannel, CancelTicket, UserInfo, ServerInfo, ClearMessage, Kick, Ban } = require('./event/event')
+const { CreateChannel, CancelTicket, UserInfo, ServerInfo, ClearMessage, Kick, Ban } = require('./event/event');
+const { RemoveAutoRoleAdd } = require('../sp_event/autoroleadd')
 
 const interactionCreate = (client) => {
      client.on("interactionCreate", async (interaction) => {
@@ -40,6 +41,9 @@ const interactionCreate = (client) => {
                          const user = interaction.options.getUser('user');
                          const reason = interaction.options.getString('reason') || 'No reason provided';
                          Ban(user,reason,interaction)
+                    }
+                    if(interaction.commandName === 'remautorole'){
+                         RemoveAutoRoleAdd(interaction)
                     }
                }
 

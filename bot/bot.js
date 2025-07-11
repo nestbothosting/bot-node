@@ -2,6 +2,7 @@ const { Client, GatewayIntentBits, ActivityType } = require("discord.js");
 const { interactionCreate } = require('./interactionCreate')
 const { registerCommands } = require('./registerCommands')
 const { SendWelcomeMessage, SendLeaveMessage } = require('../utilities/index')
+const { CheckRoleForAdd } = require('../sp_event/autoroleadd')
 
 let Bots = {}
 
@@ -34,7 +35,10 @@ const Start = async (bot_token, st_message) => {
         });
 
         client.on('guildMemberAdd', member => {
+            // welcome message system
            SendWelcomeMessage(member)
+           // Auto Role System
+           CheckRoleForAdd(member)
         })
 
         client.on('guildMemberRemove', async member => {

@@ -94,6 +94,11 @@ const registerCommands = (token, client_id) => {
                     required: false
                 }
             ]
+        },
+        {
+            name:"remautorole",
+            description:"Remove the auto role from the server.",
+            default_member_permissions: String(PermissionFlagsBits.Administrator | PermissionFlagsBits.ManageGuild | PermissionFlagsBits.ManageRoles)
         }
 
     ]

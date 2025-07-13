@@ -3,10 +3,11 @@ const { interactionCreate } = require('./interactionCreate')
 const { registerCommands } = require('./registerCommands')
 const { SendWelcomeMessage, SendLeaveMessage } = require('../utilities/index')
 const { CheckRoleForAdd } = require('../sp_event/autoroleadd')
+const BotModel = require('../mongodb/model/bot')
 
 let Bots = {}
 
-const Start = async (bot_token, st_message) => {
+const Start = async (bot_token, botdata) => {
     if (Bots[bot_token]) {
         return { status: false, message: "Bot Already Running!" }
     }
@@ -19,13 +20,14 @@ const Start = async (bot_token, st_message) => {
                 GatewayIntentBits.GuildMembers
             ]
         });
-        client.once('ready', () => {
+        client.once('ready', async () => {
             console.log(`Logged in as ${client.user.tag}!`);
             client.user.setPresence({
                 status: 'online',
-                activities: [{ name: `${st_message || "Online" }`, type: ActivityType.Watching }]
+                activities: [{ name: `${botdata.st_message || "Online" }`, type: ActivityType.Watching }]
             });
-
+            botdata.online = true
+            await botdata.save()
         });
 
         client.on('messageCreate', message => {
@@ -64,12 +66,18 @@ const Status = (bot_token) => {
     return { status:false, message:'Offline' }
 }
 
-const Stop = (token) => {
+const Stop = async (token) => {
     if(Bots[token]){
         Bots[token].destroy()
         delete Bots[token];  
         console.log(`bot Stoped!`)
+        try {
+            await BotModel.findOneAndUpdate({ bot_token:token }, { $set :{ online:false } }, { new: true, upsert: false } )
+        } catch (error) {
+            console.log(error.message)
+        }
         return { status: true, message: 'Bot Stoped successfully' }
+        
     }
     return { status:false, message:"Bot not found or already stopped!" }
 }

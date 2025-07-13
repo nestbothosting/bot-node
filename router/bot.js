@@ -51,7 +51,7 @@ route.post('/start', async (req, res) => {
     try {
         const { bot_token } = req.body;
         const botdata = await BotModel.findOne({ bot_token:bot_token })
-        const response = await Start(bot_token,botdata.st_message)
+        const response = await Start(bot_token,botdata)
         res.status(200).json(response)
     } catch (error) {
         console.log(error)

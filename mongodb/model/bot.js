@@ -10,6 +10,7 @@ const BotModel = new mongoose.Schema(
       status: { type: Boolean, default: false },
       date: { type: Date, delete: Date.now },
     },
+    online : { type:Boolean, default: false }
   },
   {
     timestamps: true

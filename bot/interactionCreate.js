@@ -1,5 +1,6 @@
 const { CreateChannel, CancelTicket, UserInfo, ServerInfo, ClearMessage, Kick, Ban } = require('./event/event');
 const { RemoveAutoRoleAdd } = require('../sp_event/autoroleadd')
+const { MoveUser, Mute, TimeOut } = require('./event/cmd')
 
 const interactionCreate = (client) => {
      client.on("interactionCreate", async (interaction) => {
@@ -40,10 +41,26 @@ const interactionCreate = (client) => {
                     if (interaction.commandName === 'ban') {
                          const user = interaction.options.getUser('user');
                          const reason = interaction.options.getString('reason') || 'No reason provided';
-                         Ban(user,reason,interaction)
+                         Ban(user, reason, interaction)
                     }
-                    if(interaction.commandName === 'remautorole'){
+                    if (interaction.commandName === 'remautorole') {
                          RemoveAutoRoleAdd(interaction)
+                    }
+                    if (interaction.commandName === 'moveuser') {
+                         const user = interaction.options.getUser('user');
+                         const channel = interaction.options.getChannel('channel');
+                         MoveUser(channel, user, interaction)
+                    }
+                    if (interaction.commandName === 'mute') {
+                         const user = interaction.options.getUser('user');
+                         const shouldMute = interaction.options.getBoolean('mute');
+                         Mute(user, shouldMute, interaction)
+                    }
+                    if (interaction.commandName === 'timeout') {
+                         const member = interaction.options.getMember('member');
+                         const duration = interaction.options.getNumber('duration');
+                         const reason = interaction.options.getString('reason') || 'No reason provided';
+                         TimeOut(member, duration, reason, interaction)
                     }
                }
 

@@ -17,7 +17,8 @@ const Start = async (bot_token, botdata) => {
                 GatewayIntentBits.Guilds,
                 GatewayIntentBits.GuildMessages,
                 GatewayIntentBits.MessageContent,
-                GatewayIntentBits.GuildMembers
+                GatewayIntentBits.GuildMembers,
+                GatewayIntentBits.GuildVoiceStates
             ]
         });
         client.once('ready', async () => {

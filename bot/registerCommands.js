@@ -96,9 +96,80 @@ const registerCommands = (token, client_id) => {
             ]
         },
         {
-            name:"remautorole",
-            description:"Remove the auto role from the server.",
+            name: "remautorole",
+            description: "Remove the auto role from the server.",
             default_member_permissions: String(PermissionFlagsBits.Administrator | PermissionFlagsBits.ManageGuild | PermissionFlagsBits.ManageRoles)
+        },
+        {
+            name: "moveuser",
+            description: "Move a user to a voice channel",
+            default_member_permissions: String(PermissionFlagsBits.Administrator | PermissionFlagsBits.ManageGuild | PermissionFlagsBits.MoveMembers | PermissionFlagsBits.ManageChannels),
+            options: [
+                {
+                    name: "user",
+                    description: "The user to move",
+                    type: ApplicationCommandOptionType.User,
+                    required: true
+                },
+                {
+                    name: "channel",
+                    description: "The voice channel to move to",
+                    type: ApplicationCommandOptionType.Channel,
+                    required: true
+                }
+            ]
+        },
+        {
+            name: 'mute',
+            description: 'Mute or unmute a user in a voice channel',
+            default_member_permissions: String(PermissionFlagsBits.Administrator | PermissionFlagsBits.MuteMembers | PermissionFlagsBits.ManageGuild),
+            options: [
+                {
+                    name: "user",
+                    description: "Mute or unmute a user in a voice channel",
+                    type: ApplicationCommandOptionType.User,
+                    required: true
+                },
+                {
+                    name: "mute",
+                    description: "Mute (true) or unmute (false)",
+                    type: ApplicationCommandOptionType.Boolean,
+                    required: true
+                }
+            ]
+        },
+        {
+            name: 'timeout',
+            description: 'Timeout a member optional reason and duration',
+            default_member_permissions: String(PermissionFlagsBits.Administrator | PermissionFlagsBits.BanMembers | PermissionFlagsBits.KickMembers),
+            options: [
+                {
+                    name: "member",
+                    description: "Member to Timeout",
+                    type: ApplicationCommandOptionType.User,
+                    required: true
+                },
+                {
+                    name: "duration",
+                    description: "Timeout duration (e.g., 10m, 1h, 1d)",
+                    type: ApplicationCommandOptionType.Number,
+                    required: true,
+                    choices: [
+                        { name: "60 seconds", value: 60_000 },
+                        { name: "2 minutes", value: 120_000 },
+                        { name: "5 minutes", value: 300_000 },
+                        { name: "10 minutes", value: 600_000 },
+                        { name: "1 day", value: 86_400_000 },
+                        { name: "1 week", value: 604_800_000 }
+                    ]
+                },
+                {
+                    name: "reason",
+                    description: "Reason for timeout",
+                    type: ApplicationCommandOptionType.String,
+                    required: false
+                }
+            ]
         }
 
     ]

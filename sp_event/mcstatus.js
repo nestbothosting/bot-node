@@ -4,40 +4,44 @@ const util = require('minecraft-server-util');
 let Interval = {}
 
 const Mcstatus = async (bot_token, paneldata) => {
+    if (Interval[paneldata.server_id]) {
+        clearInterval(Interval[paneldata.server_id])
+    }
+    const Client = await MyClient(bot_token)
+    if (!Client.status) return Client;
+    const client = Client.client;
+
+    const ServerData = await ServerStatus(paneldata.server_ip, paneldata.port)
+    const MessageJson = EmbedJson(paneldata, ServerData)
+
+    const channel = await client.channels.fetch(paneldata.channel_id);
+    if (!channel) return { status: false, message: "Oops!. Channel not found" }
     try {
-        if (Interval[paneldata.server_id]) {
-            clearInterval(Interval[paneldata.server_id])
-        }
-        const Client = await MyClient(bot_token)
-        if (!Client.status) return Client;
-        const client = Client.client;
-
-        const ServerData = await ServerStatus(paneldata.server_ip, paneldata.port)
-        const MessageJson = EmbedJson(paneldata, ServerData)
-
-        const channel = await client.channels.fetch(paneldata.channel_id);
-        if (!channel) return { status: false, message: "Oops!. Channel not found" }
-
         const ReMessage = await channel.send({ embeds: [MessageJson] });
 
-        const NewInterval = setInterval( async () => {
+        const NewInterval = setInterval(async () => {
             const ServerData = await ServerStatus(paneldata.server_ip, paneldata.port)
             const MessageJson = EmbedJson(paneldata, ServerData)
-            await ReMessage.edit({ embeds: [MessageJson] })
+            try {
+                await ReMessage.edit({ embeds: [MessageJson] })
+            } catch (error) {
+                console.log(`(MCSSS) Clear Interval for,serverid: ${paneldata.server_id}. Error: ${error.message}`)
+                if(Interval[paneldata.server_id]) clearInterval(Interval[paneldata.server_ip])
+            }
         }, 60000)
 
         Interval[paneldata.server_id] = NewInterval;
-        return { status:true, message:"Successfully Send Panel" }
+        return { status: true, message: "Successfully Send Panel" }
     } catch (error) {
         console.log(error.message)
-        return { status:false, message: error.message }
+        return { status: false, message: error.message }
     }
 };
 
 const EmbedJson = (paneldata, ServerData) => {
     const Embed = {}
     Embed.title = "Server Status"
-    Embed.color = ServerData.status ? 0x45fc03 : "red"
+    Embed.color = ServerData.status ? 0x45fc03 : 0xff0000
 
     if (paneldata.title) {
         Embed.title = paneldata.title;
@@ -52,8 +56,8 @@ const EmbedJson = (paneldata, ServerData) => {
     const Fields = [
         {
             name: `Status`,
-            value: ServerData.status ? `${paneldata.on_icon_id ? `<a:off:${paneldata.on_icon_id}> Online` : '🟢 Online'}` :
-                `${paneldata.of_icon_id ? `<a:off:${paneldata.of_icon_id}> Offline` : '🟢 Offline'}`
+            value: ServerData.status ? `${paneldata.on_icon_id ? `<a:${paneldata.on_icon_id}> Online` : '🟢 Online'}` :
+                `${paneldata.of_icon_id ? `<a:${paneldata.of_icon_id}> Offline` : '🔴 Offline'}`
         },
         {
             name: `Online Players`,

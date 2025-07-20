@@ -1,3 +1,6 @@
+const TicketModel = require('../../mongodb/model/ticket')
+const { ButtonBuilder, ButtonStyle, ActionRowBuilder, EmbedBuilder } = require('discord.js');
+
 const MoveUser = async (channel, user, interaction) => {
     const member = interaction.guild.members.cache.get(user.id);
     await interaction.deferReply({ ephemeral: true });
@@ -53,4 +56,33 @@ const TimeOut = async (member, duration, reason, interaction) => {
 
 }
 
-module.exports = { MoveUser, Mute, TimeOut }
+// cmd
+const SendTicketPanel = async (interaction) => {
+    const serverid = interaction.guildId;
+
+    try {
+        const PanelData = await TicketModel.findOne({ server_id: serverid });
+        if (!PanelData) {
+            return interaction.reply({ content: "❌ Ticket panel not found. create new Panel, Go to ``nestbot.xyz``", ephemeral: true });
+        }
+
+        const embed = EmbedBuilder.from(PanelData.embed);
+
+        const createButton = new ButtonBuilder()
+            .setCustomId('ticket_create_btn')
+            .setLabel('🎫 Create Ticket')
+            .setStyle(ButtonStyle.Primary);
+
+        const row = new ActionRowBuilder().addComponents(createButton);
+
+        await interaction.reply({
+            embeds: [embed],
+            components: [row],
+        });
+
+    } catch (error) {
+        console.error("Failed to send ticket panel:", error);
+        return interaction.reply({ content: "⚠️ Something went wrong while sending the panel.", ephemeral: true });
+    }
+};
+module.exports = { MoveUser, Mute, TimeOut, SendTicketPanel }

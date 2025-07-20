@@ -170,6 +170,11 @@ const registerCommands = (token, client_id) => {
                     required: false
                 }
             ]
+        },
+        {
+            name:"ticket_panel",
+            description:"Sends a ticket panel to the current channel",
+            default_member_permissions: String(PermissionFlagsBits.Administrator | PermissionFlagsBits.ManageGuild | PermissionFlagsBits.ManageChannels)
         }
 
     ]

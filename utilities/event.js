@@ -1,6 +1,7 @@
 const { MyClient } = require("../bot/bot");
 const TicketModel = require('../mongodb/model/ticket')
 const { EmbedBuilder, ButtonBuilder, ActionRowBuilder, ButtonStyle } = require('discord.js');
+const { SaveBotLog } = require("../sp_event/botlog");
 
 const checkOrCreateURL = (url) => {
     return url;
@@ -86,7 +87,7 @@ const SendTicket = async (ticketdata, fieldvalue, permission, bot_token) => {
         const row = new ActionRowBuilder().addComponents(button);
 
         await channel.send({ embeds: [embed], components: [row] });
-
+        SaveBotLog(null,`Create Ticket Page Server id: ${ticketdata.server_id}`,'TIcket System', bot_token)
         return { status: true, message: "Ticket sent successfully." };
 
     } catch (error) {

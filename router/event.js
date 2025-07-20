@@ -4,6 +4,7 @@ const { SendTicket, SendEmbed, SayText } = require('../utilities/event')
 const { Mcstatus } = require('../sp_event/mcstatus')
 const { SetMessage, GetMessages, StartMessage, StopMessage, DeleteMessage } = require('../sp_event/timedmessage')
 const { SetAutoRole } = require('../sp_event/autoroleadd')
+const { SaveMessage, GetAllAutoRPCollections, DeleteARMS } = require('../sp_event/autoreplay')
 
 route.post('/ticket', async (req,res) => {
     const { ticketdata, fieldvalue, permission, bot_token } = req.body;
@@ -63,6 +64,24 @@ route.post('/autoroleadd', async (req,res) => {
 route.post('/say', async (req,res) => {
     const { server_id, channel_id, message, token } = req.body;
     const response = await SayText(server_id, channel_id, message, token)
+    res.status(200).json(response)
+})
+
+route.post('/autoreplay', async (req,res) => {
+    const { serverdata, messagekey, messageReplay, bot_token } = req.body;
+    const response = await SaveMessage(serverdata, messagekey, messageReplay, bot_token)
+    res.status(200).json(response)
+})
+
+route.get('/autoreplay/:server_id', async (req,res) => {
+    const { server_id } = req.params;
+    const response = await GetAllAutoRPCollections(server_id)
+    res.status(200).json(response)
+})
+
+route.get('/delete_autoreplay/:cid', async (req,res) => {
+    const { cid } = req.params;
+    const response = await DeleteARMS(cid)
     res.status(200).json(response)
 })
 

@@ -3,7 +3,8 @@ const { interactionCreate } = require('./interactionCreate')
 const { registerCommands } = require('./registerCommands')
 const { SendWelcomeMessage, SendLeaveMessage } = require('../utilities/index')
 const { CheckRoleForAdd } = require('../sp_event/autoroleadd')
-const BotModel = require('../mongodb/model/bot')
+const BotModel = require('../mongodb/model/bot');
+const { CheckMessageARMS } = require("../sp_event/autoreplay");
 
 let Bots = {}
 
@@ -32,6 +33,11 @@ const Start = async (bot_token, botdata) => {
         });
 
         client.on('messageCreate', message => {
+            if (message.author.bot) return;
+            CheckMessageARMS(message.guildId, message.content, message)
+        })
+
+        client.on('messageCreate', message => {
             if (message.content === '!ping') {
                 message.reply('Pong! 🏓');
             }
@@ -45,6 +51,7 @@ const Start = async (bot_token, botdata) => {
         })
 
         client.on('guildMemberRemove', async member => {
+            // Leave user message System
             SendLeaveMessage(member)
         })
 

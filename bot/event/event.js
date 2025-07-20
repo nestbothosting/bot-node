@@ -22,16 +22,16 @@ const CreateChannel = async (interaction) => {
 
         // Build permission overwrites from PanelData
         const permissionOverwrites = PanelData.permissions.map(rolePerm => {
-            if (!rolePerm.role_id || !Array.isArray(rolePerm.permission)) {
+            if (!rolePerm.id) {
                 console.warn(`Invalid role permissions found in PanelData: ${JSON.stringify(rolePerm)}`);
-                return null; // Skip invalid entries
+                return null; 
             }
 
             return {
-                id: rolePerm.role_id,
-                allow: rolePerm.permission.map(p => BigInt(p.code)),
+                id: rolePerm.id,
+                allow: [PermissionsBitField.Flags.ViewChannel]
             };
-        }).filter(Boolean); // Remove null entries
+        })
 
         // Allow the interaction user to view the channel
         permissionOverwrites.push({

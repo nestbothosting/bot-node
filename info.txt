@@ -57,6 +57,7 @@ set Auto Role Add = urlpath:/event/autoroleadd - method:post - body : { server_i
 send Message a Channel = urlpath:/event/say - method:post - body : { server_id, channel_id, message, token }
 
 get gots (admin) = urlpath:/admin/bots/:page - method:GET - res : { status, bots }
+get online bots (admin) = urlpath:/admin/onlinebots:page - method:get - { status, bots }
 
 create auto replay message = urlpath:/event/autoreplay - method:post -  body: { serverdata, messagekey, messageReplay }
 get all auto replay data = urlpath:/event/autoreplay/:server_id - method:get - res : { status, autoreplays }

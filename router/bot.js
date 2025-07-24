@@ -95,13 +95,13 @@ route.post('/roles', async (req,res) => {
     res.status(200).json(response)
 })
 
-route.get('/info/:bot_id', async (req,res) => {
+route.get('/info/:bot_id', async (req,res) => { // bot_id means collection id. for the node database.
     const { bot_id } = req.params;
     const response = await GetBotInfo(bot_id)
     res.status(200).json(response)
 })
 
-route.get('/log/:bot_cid', async (req,res) => {
+route.get('/log/:bot_cid', async (req,res) => { // cid means collection id. for the node database.
     const { bot_cid } = req.params;
     const response = await GetBotLog(bot_cid)
     res.status(200).json(response)

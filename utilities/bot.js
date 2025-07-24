@@ -183,14 +183,17 @@ const GetBotInfo = async (bot_id) => {
             Response.bot_id = `nodeCid-${bot_id}`;
             Response.bot_status = false;
             Response.status = true;
+            Response.uptime = CalculateUpTime(0)
             return Response;
         } else {
             Response.bot_name = ClientData.client.user.username;
             Response.bot_id = ClientData.client.user.id;
+            Response.uptime = CalculateUpTime(ClientData.client.uptime)
             Response.bot_avatar = ClientData.client.user.displayAvatarURL({
                 dynamic: true,
                 size: 512
             });
+
             (Response.bot_status = true), (Response.status = true);
             return Response;
         }
@@ -199,6 +202,16 @@ const GetBotInfo = async (bot_id) => {
         return { status: false, message: error.message };
     }
 };
+
+//calculate a Bot UpTime
+const CalculateUpTime = (uptimeMilliseconds) => {
+    let seconds, minutes, hours, days = 0
+    seconds = Math.floor(uptimeMilliseconds / 1000) % 60;
+    minutes = Math.floor(uptimeMilliseconds / (1000 * 60)) % 60;
+    hours = Math.floor(uptimeMilliseconds / (1000 * 60 * 60)) % 24;
+    days = Math.floor(uptimeMilliseconds / (1000 * 60 * 60 * 24))
+    return `Days: ${days}. Hours: ${hours}. Minutes: ${minutes}. Seconds: ${seconds}.`
+}
 
 module.exports = {
     SaveBot,

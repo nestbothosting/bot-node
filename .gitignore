@@ -1,2 +1,3 @@
 .env
+/core/auth.json
 node_modules

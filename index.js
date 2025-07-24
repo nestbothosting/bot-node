@@ -2,6 +2,7 @@ const express = require('express')
 const Check_API_KEY = require('./api_key')
 const cors = require('cors')
 require('./mongodb/db')
+require('./core/auto_start')
 
 const app = express()
 

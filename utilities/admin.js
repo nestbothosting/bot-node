@@ -56,6 +56,7 @@ const GetOnlineBots = async (page) => {
                 botobj.bot_name = bot.bot_name;
                 botobj.bot_id = bot._id;
                 botobj.c_status = false;
+                botobj.token = bot.bot_token;
                 Bots.push(botobj);
                 continue;
             }
@@ -65,6 +66,7 @@ const GetOnlineBots = async (page) => {
             botobj.bot_name = client.client.user.username;
             botobj.bot_id = client.client.user.id;
             botobj.c_status = true;
+            botobj.token = bot.bot_token;
             Bots.push(botobj);
         }
 

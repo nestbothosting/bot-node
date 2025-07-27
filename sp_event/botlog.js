@@ -45,7 +45,7 @@ const SaveBotLog = async (bot_cid, message, action, token) => {
         await BotLog.save();
 
     } catch (error) {
-        console.log(`Bot Log Error. Bot CID: ${id ? id : 'null'}. Error: ${error}`);
+        console.log(`Bot Log Error. Bot. Error: ${error}`);
     }
 };
 

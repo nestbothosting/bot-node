@@ -60,8 +60,8 @@ route.post('/delete_yns', async (req,res) => {
 })
 
 route.post('/set_welcome_message', async (req,res) => {
-    const { server_id, channel_id, message, bot_id } = req.body;
-    const response = await CreateWelcomeMessage(server_id, channel_id, message, bot_id)
+    const { server_id, channel_id, message, bot_id, Embed } = req.body;
+    const response = await CreateWelcomeMessage(server_id, channel_id, message, bot_id, Embed)
     res.status(200).json(response)
 })
 

@@ -43,29 +43,54 @@ const DeleteTicketPanel = async (server_id) => {
     }
 }
 
-const CreateWelcomeMessage = async (server_id, channel_id, message, bot_id) => {
+const CreateWelcomeMessage = async (server_id, channel_id, message, bot_id, Embed) => {
     try {
-        if (!server_id || !channel_id || !message || !bot_id) return { status: false, message: "Enter all Values. Server ID, Channel ID, Bot ID and Message" }
         const EXData = await WLMModel.findOne({ server_id });
         if (EXData) {
             if (EXData.Iswelcome) return { status: false, message: "Welcome message already set for this server." }
-            EXData.welcome_message = message;
-            EXData.Iswelcome = true;
-            EXData.wl_channel_id = channel_id;
-            await EXData.save()
-            SaveBotLog(bot_id, `Set Welcome Message. Server ID: ${server_id}`, "WelcomeMS")
-            return { status: true, message: "Welcome message updated successfully." };
+
+            if (Embed) {
+                if (!Embed.title) return { status: false, message: "Embed Title is Required" }
+                EXData.Iswelcome = true;
+                EXData.wl_channel_id = channel_id;
+                EXData.wl_isEmbed = true;
+                EXData.wl_embed = Embed;
+                await EXData.save()
+                SaveBotLog(bot_id, `Set Welcome Message. Server ID: ${server_id}`, "WelcomeMS")
+                return { status: true, message: "Welcome message updated successfully." };
+            } else {
+                EXData.welcome_message = message;
+                EXData.Iswelcome = true;
+                EXData.wl_channel_id = channel_id;
+                await EXData.save()
+                SaveBotLog(bot_id, `Set Welcome Message. Server ID: ${server_id}`, "WelcomeMS")
+                return { status: true, message: "Welcome message updated successfully." };
+            }
+
         }
-        const NewData = new WLMModel({
-            server_id,
-            bot_id,
-            wl_channel_id: channel_id,
-            welcome_message: message,
-            Iswelcome: true
-        });
-        SaveBotLog(bot_id, `Set Welcome Message. Server ID: ${server_id}`, "WelcomeMS")
-        await NewData.save();
-        return { status: true, message: "Welcome message created successfully." };
+
+        if (Embed) {
+            const NewData = new WLMModel({
+                server_id,
+                bot_id,
+                wl_channel_id: channel_id,
+                wl_embed: Embed,
+                Iswelcome: true,
+                wl_isEmbed: true
+            });
+            await NewData.save();
+            return { status: true, message: "Welcome message created successfully." };
+        } else {
+            const NewData = new WLMModel({
+                server_id,
+                bot_id,
+                wl_channel_id: channel_id,
+                welcome_message: message,
+                Iswelcome: true
+            });
+            await NewData.save();
+            return { status: true, message: "Welcome message created successfully." };
+        }
     } catch (error) {
         console.error("Error creating welcome message:", error);
         return { status: false, message: "An error occurred while creating the welcome message." };
@@ -103,18 +128,44 @@ const CreateLeaveMessage = async (server_id, channel_id, message, bot_id) => {
 
 const SendWelcomeMessage = async (member) => {
     try {
-        const WelcomeData = await WLMModel.findOne({ server_id: member.guild.id, Iswelcome: true })
+        const WelcomeData = await WLMModel.findOne({ server_id: member.guild.id, Iswelcome: true });
         if (!WelcomeData) return;
 
         const channel = member.guild.channels.cache.get(WelcomeData.wl_channel_id);
         if (!channel) return;
 
-        const finalMessage = WelcomeData.welcome_message.replace(/{user}/g, `<@${member.id}>`).replace(/{server}/g, member.guild.name);
-        channel.send(finalMessage);
+        if (WelcomeData.wl_isEmbed) {
+            const EmbedModel = {
+                title: WelcomeData.wl_embed.title?.replace(/{user}/g, `${member.username}`).replace(/{server}/g, member.guild.name),
+                description: WelcomeData.wl_embed.description?.replace(/{user}/g, `<@${member.id}>`).replace(/{server}/g, member.guild.name),
+                color: parseInt(WelcomeData.wl_embed.color.replace('#', ''), 16),
+                author: {
+                    name: WelcomeData.wl_embed.author_name,
+                    icon_url: WelcomeData.wl_embed.author_icon,
+                    url: WelcomeData.wl_embed.author_url
+                },
+                image: {
+                    url: WelcomeData.wl_embed.image?.replace(/{user-avatar}/g, member.displayAvatarURL({ dynamic: true, format: 'png', size: 1024 }))
+                },
+                thumbnail: {
+                    url: WelcomeData.wl_embed.thumbnail?.replace(/{user-avatar}/g, member.displayAvatarURL({ dynamic: true, format: 'png', size: 1024 }))
+                },
+                footer: {
+                    text: WelcomeData.wl_embed.footer_title,
+                    icon_url: WelcomeData.wl_embed.footer_icon
+                },
+                timestamp: new Date()
+            };
+            channel.send({ embeds: [EmbedModel] });
+        }else if (WelcomeData.welcome_message) {
+            const finalMessage = WelcomeData.welcome_message.replace(/{user}/g, `<@${member.id}>`).replace(/{server}/g, member.guild.name);
+            channel.send(finalMessage);
+        }
     } catch (error) {
         console.error("⚠️ Error handling welcome:", error);
     }
-}
+};
+
 
 const SendLeaveMessage = async (member) => {
     try {
@@ -154,15 +205,19 @@ const DeleteWLMessage = async (server_id, type) => {
             data.Iswelcome = false;
             data.welcome_message = undefined;
             data.wl_channel_id = undefined;
+            data.wl_isEmbed = false,
+            data.wl_embed = undefined
         } else if (type === "leave") {
             data.isleave = false;
             data.leave_message = undefined;
             data.lv_channel_id = undefined;
+            data.lv_isEmbed = false,
+            data.lv_embed = undefined
         }
 
         await data.save();
-        SaveBotLog(WLMModel.bot_id, `Delete ${type} System. Server ID: ${server_id}`, `${type}MS`)
-        return { status: true, message: `${type} message deleted successfully.` };
+        SaveBotLog(data.bot_id, `Delete ${type} Message System. Server ID: ${server_id}`, `${type}MS`)
+        return { status: true, message: `${type} System message deleted successfully.` };
 
     } catch (error) {
         console.error("❌ Error in DeleteWLMessage:", error);

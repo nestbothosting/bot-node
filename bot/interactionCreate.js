@@ -1,4 +1,4 @@
-const { CreateChannel, CancelTicket, UserInfo, ServerInfo, ClearMessage, Kick, Ban } = require('./event/event');
+const { CreateChannel, CancelTicket, UserInfo, ServerInfo, ClearMessage, Kick, Ban, DeleteTicket } = require('./event/event');
 const { RemoveAutoRoleAdd } = require('../sp_event/autoroleadd')
 const { MoveUser, Mute, TimeOut, SendTicketPanel } = require('./event/cmd')
 
@@ -64,6 +64,9 @@ const interactionCreate = (client) => {
                     }
                     if(interaction.commandName === 'ticket_panel'){
                          SendTicketPanel(interaction)
+                    }
+                    if(interaction.commandName === 'ticket-cancel'){
+                         DeleteTicket(interaction)
                     }
                }
 

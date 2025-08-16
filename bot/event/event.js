@@ -24,7 +24,7 @@ const CreateChannel = async (interaction) => {
         const permissionOverwrites = PanelData.permissions.map(rolePerm => {
             if (!rolePerm.id) {
                 console.warn(`Invalid role permissions found in PanelData: ${JSON.stringify(rolePerm)}`);
-                return null; 
+                return null;
             }
 
             return {
@@ -163,6 +163,7 @@ const ServerInfo = async (guild, owner, interaction) => {
     await interaction.reply({ embeds: [embed] });
 }
 
+// clear 0 to 100 messages
 const ClearMessage = async (interaction, amount) => {
     try {
         // Deleting the messages
@@ -180,6 +181,8 @@ const ClearMessage = async (interaction, amount) => {
     }
 }
 
+
+// kick a user
 const Kick = async (user, reason, interaction) => {
     if (!interaction.guild) {
         return interaction.reply({ content: "❌ This command can only be used in a server.", ephemeral: true });
@@ -204,6 +207,8 @@ const Kick = async (user, reason, interaction) => {
     }
 }
 
+
+// ban a user
 const Ban = async (user, reason, interaction) => {
 
     if (!interaction.guild) {
@@ -228,4 +233,33 @@ const Ban = async (user, reason, interaction) => {
     }
 }
 
-module.exports = { CreateChannel, CancelTicket, UserInfo, ServerInfo, ClearMessage, Kick, Ban };
+// delete ticket channel
+const DeleteTicket = async (interaction) => {
+    const channel = interaction.channel;
+
+    if (!channel.name.includes("ticket")) {
+        await interaction.reply({
+            content: `This is not a ticket channel.`,
+            ephemeral: true,
+        });
+    } else {
+        await interaction.reply({
+            content: "Deleting ticket in 3 seconds...",
+            ephemeral: true,
+        });
+
+        await interaction.followUp({
+            content: "This ticket will be removed shortly...",
+            ephemeral: true,
+        });
+
+        setTimeout(async () => {
+            await channel.delete().catch(err => 
+                console.error('Failed to delete ticket channel:', err)
+            );
+        }, 3000);
+    }
+};
+
+
+module.exports = { CreateChannel, CancelTicket, UserInfo, ServerInfo, ClearMessage, Kick, Ban, DeleteTicket };

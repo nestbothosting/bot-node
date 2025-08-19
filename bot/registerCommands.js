@@ -172,13 +172,59 @@ const registerCommands = (token, client_id) => {
             ]
         },
         {
-            name:"ticket_panel",
-            description:"Sends a ticket panel to the current channel",
+            name: "ticket_panel",
+            description: "Sends a ticket panel to the current channel",
             default_member_permissions: String(PermissionFlagsBits.Administrator | PermissionFlagsBits.ManageGuild | PermissionFlagsBits.ManageChannels)
         },
         {
-            name:"ticket-cancel",
-            description:"Cancel/close the current ticket"
+            name: "ticket-cancel",
+            description: "Cancel/close the current ticket"
+        },
+        {
+            name: 'warn',
+            description: "Warn a user",
+            default_member_permissions: String(PermissionFlagsBits.Administrator | PermissionFlagsBits.ManageGuild | PermissionFlagsBits.BanMembers),
+            options: [
+                {
+                    name: "user",
+                    description: "The user to warn",
+                    type: ApplicationCommandOptionType.User,
+                    required: true
+                },
+                {
+                    name: "reason",
+                    description: "Reason of the warn",
+                    type: ApplicationCommandOptionType.String,
+                    required: false
+                }
+            ]
+        },
+        {
+            name: 'warnings',
+            description: 'List Warnings of a User',
+            default_member_permissions: String(PermissionFlagsBits.Administrator | PermissionFlagsBits.ManageGuild | PermissionFlagsBits.BanMembers),
+            options: [
+                {
+                    name: "user",
+                    description: "user to List",
+                    type: ApplicationCommandOptionType.User,
+                    required: true
+                }
+            ]
+        },
+        {
+            name: 'warn_remove',
+            description: 'Remove a User Warnings',
+            default_member_permissions: String(PermissionFlagsBits.Administrator | PermissionFlagsBits.ManageGuild | PermissionFlagsBits.BanMembers),
+            options: [
+                {
+                    name: "user",
+                    description: "User to Remove Warnings",
+                    type: ApplicationCommandOptionType.User,
+                    required: true
+                }
+            ]
+
         }
 
     ]

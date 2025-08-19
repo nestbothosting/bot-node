@@ -1,4 +1,5 @@
 const TicketModel = require('../../mongodb/model/ticket')
+const WarnModel = require('../../mongodb/model/warn')
 const { ButtonBuilder, ButtonStyle, ActionRowBuilder, EmbedBuilder } = require('discord.js');
 
 const MoveUser = async (channel, user, interaction) => {
@@ -85,4 +86,144 @@ const SendTicketPanel = async (interaction) => {
         return interaction.reply({ content: "⚠️ Something went wrong while sending the panel.", ephemeral: true });
     }
 };
-module.exports = { MoveUser, Mute, TimeOut, SendTicketPanel }
+
+// warn a user
+const WarnUser = async (user, reason, interaction) => {
+    const MAX_WARNS = 23;
+
+    if (!user) {
+        return interaction.reply({ content: '⚠️ Please select a user.', ephemeral: true });
+    }
+
+    try {
+        let UserData = await WarnModel.findOne({ userid: user.id, guildId: interaction.guild.id });
+
+        if (!UserData) {
+            // create a new warn entry
+            const NewModel = new WarnModel({
+                guildId: interaction.guild.id,
+                userid: user.id,
+                warnings: [
+                    {
+                        moderatorid: interaction.user.id,
+                        reason: reason || "No reason provided"
+                    }
+                ]
+            });
+
+            await NewModel.save();
+
+            await interaction.reply({
+                content: `<@${user.id}> has been warned! 📌 Reason: ${reason || "No reason provided"}`
+            });
+
+            return; // stop here
+        }
+
+        // if max warns reached
+        if (UserData.warnings.length >= MAX_WARNS) {
+            await interaction.reply({
+                content: `<@${user.id}> has been warned again! 📌 Reason: ${reason || "No reason provided"}`
+            });
+
+            return interaction.followUp({
+                content: `⚠️ <@${user.id}> has now reached the **maximum warning limit (${MAX_WARNS})**!`
+            });
+        }
+
+        // add a warning
+        UserData.warnings.push({
+            moderatorid: interaction.user.id,
+            reason: reason || "No reason provided"
+        });
+
+        await UserData.save();
+
+        await interaction.reply({
+            content: `<@${user.id}> has been warned! 📌 Reason: ${reason || "No reason provided"}`
+        });
+
+        // optional extra message
+        await interaction.followUp({
+            content: `⚠️ They now have **${UserData.warnings.length}/${MAX_WARNS} warnings**.`
+        });
+
+    } catch (error) {
+        console.error(error);
+        if (interaction.replied) {
+            await interaction.followUp({ content: `⚠️ Oops, Warn Error: ${error.message}`, ephemeral: true });
+        } else {
+            await interaction.reply({ content: `⚠️ Oops, Warn Error: ${error.message}`, ephemeral: true });
+        }
+    }
+};
+
+// Get a User Warn List
+const UserWarnList = async (user, interaction) => {
+    try {
+        const WarnList = await WarnModel.findOne({
+            userid: user.id,
+            guildId: interaction.guild.id,
+        });
+
+        if (!WarnList || WarnList.warnings.length === 0) {
+            const NoWarnEmbed = new EmbedBuilder()
+                .setTitle(`${user.username}'s Warnings`)
+                .setDescription("✅ This user has **0 warnings**.")
+                .setColor("Green");
+            return interaction.reply({ embeds: [NoWarnEmbed], ephemeral: true });
+        }
+
+        // If warnings exist
+        const WarnEmbed = new EmbedBuilder()
+            .setTitle(`${user.username}'s Warnings (${WarnList.warnings.length})`)
+            .setColor("Red");
+
+        for (let i = 0; i < WarnList.warnings.length; i++) {
+            const warn = WarnList.warnings[i];
+            const unixTimestamp = Math.floor(warn.date / 1000);
+
+            WarnEmbed.addFields({
+                name: `⚠️ Warning #${i + 1}`,
+                value: `**Reason:** ${warn.reason}\n**Moderator:** <@${warn.moderatorid}>\n**Date:** <t:${unixTimestamp}:R>`,
+                inline: false,
+            });
+        }
+
+        return interaction.reply({ embeds: [WarnEmbed] });
+
+    } catch (error) {
+        console.error(error);
+        return interaction.reply({
+            content: "❌ An error occurred while fetching warnings.",
+            ephemeral: true,
+        });
+    }
+};
+
+const RemoveUserWarns = async (user, interaction) => {
+    try {
+        const Warns = await WarnModel.findOne({ userid: user.id, guildId: interaction.guild.id })
+        if (!Warns) {
+            const noWarns = new EmbedBuilder()
+                .setTitle(`No Warnings. ${user.username}`)
+                .setColor('Yellow')
+                .setTimestamp()
+
+            await interaction.reply({ embeds: [noWarns] })
+        }
+        // deleting Warns
+        Warns.deleteOne()
+        const inWarns = new EmbedBuilder()
+            .setTitle(`Deleted warnings for ${user.username}`)
+            .setColor('Green')
+            .setTimestamp()
+
+        await interaction.reply({ embeds: [inWarns] });
+    } catch (error) {
+        await interaction.reply({ content: `oops! Error: ${error.message}`, ephemeral: true });
+    }
+}
+
+
+module.exports = { MoveUser, Mute, TimeOut, SendTicketPanel, WarnUser, UserWarnList, RemoveUserWarns }

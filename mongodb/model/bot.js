@@ -2,7 +2,7 @@ const mongoose = require("mongoose");
 
 const BotModel = new mongoose.Schema(
   {
-    bot_token: { type: String, required: true },
+    bot_token: { type: String, required: true, unique: true },
     bot_name: { type: String, required: true },
     owner_id: { type: String, required: true },
     st_message: { type: String, required: true, default:'nestbot.xyz' },

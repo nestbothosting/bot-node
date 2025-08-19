@@ -1,6 +1,6 @@
 const { CreateChannel, CancelTicket, UserInfo, ServerInfo, ClearMessage, Kick, Ban, DeleteTicket } = require('./event/event');
 const { RemoveAutoRoleAdd } = require('../sp_event/autoroleadd')
-const { MoveUser, Mute, TimeOut, SendTicketPanel } = require('./event/cmd')
+const { MoveUser, Mute, TimeOut, SendTicketPanel, WarnUser, UserWarnList, RemoveUserWarns } = require('./event/cmd')
 
 const interactionCreate = (client) => {
      client.on("interactionCreate", async (interaction) => {
@@ -62,11 +62,24 @@ const interactionCreate = (client) => {
                          const reason = interaction.options.getString('reason') || 'No reason provided';
                          TimeOut(member, duration, reason, interaction)
                     }
-                    if(interaction.commandName === 'ticket_panel'){
+                    if (interaction.commandName === 'ticket_panel') {
                          SendTicketPanel(interaction)
                     }
-                    if(interaction.commandName === 'ticket-cancel'){
+                    if (interaction.commandName === 'ticket-cancel') {
                          DeleteTicket(interaction)
+                    }
+                    if (interaction.commandName === 'warn') {
+                         const user = interaction.options.getUser('user');
+                         const reason = interaction.options.getString('reason') || 'No reason provided';
+                         WarnUser(user, reason, interaction)
+                    }
+                    if (interaction.commandName === 'warnings') {
+                         const user = interaction.options.getUser('user');
+                         UserWarnList(user, interaction)
+                    }
+                    if (interaction.commandName === 'warn_remove') {
+                         const user = interaction.options.getUser('user');
+                         RemoveUserWarns(user,interaction)
                     }
                }
 

@@ -203,17 +203,17 @@ const UserWarnList = async (user, interaction) => {
 
 const RemoveUserWarns = async (user, interaction) => {
     try {
-        const Warns = await WarnModel.findOne({ userid: user.id, guildId: interaction.guild.id })
+        const Warns = await WarnModel.exists({ userid: user.id, guildId: interaction.guild.id })
         if (!Warns) {
             const noWarns = new EmbedBuilder()
                 .setTitle(`No Warnings. ${user.username}`)
                 .setColor('Yellow')
                 .setTimestamp()
 
-            await interaction.reply({ embeds: [noWarns] })
+            return await interaction.reply({ embeds: [noWarns] })
         }
         // deleting Warns
-        Warns.deleteOne()
+        await WarnModel.findOneAndDelete({ userid: user.id, guildId: interaction.guild.id })
         const inWarns = new EmbedBuilder()
             .setTitle(`Deleted warnings for ${user.username}`)
             .setColor('Green')
